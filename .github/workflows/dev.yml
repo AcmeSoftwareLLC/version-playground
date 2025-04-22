@@ -33,7 +33,6 @@ jobs:
           version_format: "${major}.${minor}.${patch}-rc"
           bump_each_commit: false
           search_commit_body: true
-          namespace: rc
 
       - name: Bump version and push tag
         id: tag_version
@@ -59,3 +58,4 @@ jobs:
           name: ${{ steps.versioning.outputs.version_tag }}
           body: ${{ steps.changelog.outputs.changelog }}
           commit: ${{ steps.versioning.outputs.current_commit }}
+          prerelease: true

@@ -60,15 +60,3 @@ jobs:
           draft: false
           prerelease: false
           commit: ${{ steps.versioning.outputs.current_commit }}
-
-      - name: Update CHANGELOG & update develop branch
-        run: |
-          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
-          git config --global user.email "${{ env.CI_COMMIT_AUTHOR }}"
-          changelog='${{ steps.changelog.outputs.changelog }}'
-          escaped_changelog=$(printf '%s\n' "$changelog" | sed 's/\\/&&/g;s/^[[:blank:]]/\\&/;s/$/\\/')
-          sed -i "2i ${escaped_changelog%?}" CHANGELOG.md
-          sed -i "2i ## ${{ steps.versioning.outputs.version_tag }} - $(date +'%d-%m-%Y')" CHANGELOG.md
-          git add -A && git commit -m "chore(docs): update CHANGELOG.MD"
-          git push origin main
-          git push --force origin main:develop

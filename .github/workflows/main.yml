@@ -1,0 +1,62 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CI_COMMIT_MESSAGE: Deployment by CI
+  CI_COMMIT_AUTHOR: ci@acmesoftware.com
+
+jobs:
+  dev:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Perform semantic version
+        uses: paulhatch/semantic-version@v5.4.0
+        id: versioning
+        with:
+          tag_prefix: "v"
+          major_pattern: "(MAJOR)"
+          minor_pattern: "(MINOR)"
+          version_format: "${major}.${minor}.${patch}-rc${increment}"
+          bump_each_commit: false
+          search_commit_body: true
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          custom_tag: ${{ steps.versioning.outputs.version_tag }}
+          tag_prefix: ""
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        with:
+          fromTag: v${{ steps.versioning.outputs.previous_version }}
+          toTag: ${{ steps.tag_version.outputs.new_tag }}
+          fetchReviewers: true
+
+      - name: Create production release
+        uses: ncipollo/release-action@v1
+        id: release
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: ${{ steps.versioning.outputs.version_tag }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+          commit: ${{ steps.versioning.outputs.current_commit }}

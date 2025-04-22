@@ -1,3 +1,5 @@
+name: PR Version
+
 on:
   pull_request_target:
     types:
@@ -20,7 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
           fetch-depth: 0
 
       - name: Perform semantic version

@@ -58,6 +58,4 @@ jobs:
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: ${{ steps.versioning.outputs.version_tag }}
           body: ${{ steps.changelog.outputs.changelog }}
-          draft: false
-          prerelease: true
           commit: ${{ steps.versioning.outputs.current_commit }}

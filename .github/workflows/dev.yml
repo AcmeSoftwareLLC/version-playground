@@ -49,6 +49,7 @@ jobs:
         with:
           fromTag: v${{ steps.versioning.outputs.previous_version }}
           toTag: ${{ steps.tag_version.outputs.new_tag }}
+          fetchReviewers: true
 
       - name: Create production release
         uses: ncipollo/release-action@v1

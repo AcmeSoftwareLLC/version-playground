@@ -1,9 +1,9 @@
-name: Dev
+name: Main
 
 on:
   push:
     branches:
-      - develop
+      - main
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -58,5 +58,5 @@ jobs:
           name: ${{ steps.versioning.outputs.version_tag }}
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
-          prerelease: true
+          prerelease: false
           commit: ${{ steps.versioning.outputs.current_commit }}

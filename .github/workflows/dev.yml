@@ -27,12 +27,13 @@ jobs:
         uses: paulhatch/semantic-version@v5.4.0
         id: versioning
         with:
-          tag_prefix: "v"
+          tag_prefix: v
           major_pattern: "(MAJOR)"
           minor_pattern: "(MINOR)"
           version_format: "${major}.${minor}.${patch}-rc"
           bump_each_commit: false
           search_commit_body: true
+          namespace: rc
 
       - name: Bump version and push tag
         id: tag_version

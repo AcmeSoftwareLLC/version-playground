@@ -20,43 +20,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Perform semantic version
-        uses: paulhatch/semantic-version@v5.4.0
-        id: versioning
+      - name: Generate Next Tag
+        uses: AcmeSoftwareLLC/semver-tag@v1
+        id: semver
         with:
-          tag_prefix: v
-          major_pattern: "(MAJOR)"
-          minor_pattern: "(MINOR)"
-          version_format: "${major}.${minor}.${patch}-rc"
-          bump_each_commit: false
-          search_commit_body: true
-          namespace: rc
+          token: ${{ secrets.GITHUB_TOKEN }}
+          level: patch
 
       - name: Bump version and push tag
-        id: tag_version
+        id: tag_action
         uses: mathieudutour/github-tag-action@v6.2
         with:
-          custom_tag: ${{ steps.versioning.outputs.version_tag }}
-          tag_prefix: ""
+          custom_tag: ${{ steps.semver.outputs.next_tag }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Changelog
         id: changelog
         uses: mikepenz/release-changelog-builder-action@v5
         with:
-          fromTag: v${{ steps.versioning.outputs.previous_version }}
-          toTag: ${{ steps.tag_version.outputs.new_tag }}
+          fromTag: v${{ steps.semver.outputs.prev_tag }}
+          toTag: ${{ steps.tag_action.outputs.new_tag }}
           fetchReviewers: true
 
-      - name: Create production release
+      - name: Create dev release
         uses: ncipollo/release-action@v1
         id: release
         with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: ${{ steps.versioning.outputs.version_tag }}
+          tag: ${{ steps.tag_action.outputs.new_tag }}
+          name: ${{ steps.tag_action.outputs.new_tag }}
           body: ${{ steps.changelog.outputs.changelog }}
-          commit: ${{ steps.versioning.outputs.current_commit }}
           prerelease: true

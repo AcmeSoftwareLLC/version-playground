@@ -21,22 +21,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Perform semantic version
-        uses: paulhatch/semantic-version@v5.4.0
-        id: versioning
+      - name: Determine Increment Level
+        id: increment
+        run: |
+          if [[ "${{ github.event.pull_request.base.ref }}" == "main" ]]; then
+            echo "level=minor" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.pull_request.base.ref }}" == "develop" ]]; then
+            echo "level=patch" >> $GITHUB_OUTPUT
+          else
+            echo "level=patch" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate Next Tag
+        uses: AcmeSoftwareLLC/semver-tag@v1
+        id: semver
         with:
-          tag_prefix: "v"
-          major_pattern: "(MAJOR)"
-          minor_pattern: "(MINOR)"
-          version_format: "${major}.${minor}.${patch}-rc${increment}"
-          bump_each_commit: false
-          search_commit_body: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          level: ${{ steps.increment.outputs.level }}
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-            :rocket: The next version will be **${{ steps.versioning.outputs.version_tag }}** ! :rocket:
+            :rocket: The next version will be **${{ steps.semver.outputs.next_tag }}** ! :rocket:

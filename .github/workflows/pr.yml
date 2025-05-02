@@ -48,8 +48,12 @@ jobs:
             ### ✅ PR Title Formatted Correctly
             The title of this PR has been updated to match the correct format. Thank you!
 
-      - name: Fail the job
-        if: ${{ steps.check.outputs.success == 'false'}}
+      - name: Validate PR title format
         run: |
-          echo "PR title is not formatted correctly. Please update the title to match the format."
-          exit 1
+          if [ "${{ steps.check.outputs.success }}" = "true" ]; then
+            echo "PR title format is correct."
+            exit 0
+          else
+            echo "PR title is not formatted correctly. Please update the title to match the format."
+            exit 1
+          fi

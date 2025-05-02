@@ -1,0 +1,17 @@
+{
+  "LABEL": {
+    "name": "fix-title",
+    "color": "EEEEEE"
+  },
+  "CHECKS": {
+    "prefixes": "",
+    "regexp": "^\\[JMACS-[0-9]{3,}\\]\\s.+$",
+    "regexpFlags": "",
+    "ignoreLabels": ["meta"]
+  },
+  "MESSAGES": {
+    "success": "✅ PR title format is correct.",
+    "failure": "❌ PR title must start with [JMACS-###] followed by a description.",
+    "notice": ""
+  }
+}

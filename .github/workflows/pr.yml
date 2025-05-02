@@ -46,10 +46,24 @@ jobs:
             The title of this PR has been updated to match the correct format. Thank you!
 
       - name: Check Labels
+        id: check-labels
         uses: docker://agilepathway/pull-request-label-checker:latest
         with:
           one_of: fix,feature,meta
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          allow_failure: true
+
+      - name: Add comment that labels are missing
+        if: ${{ steps.check-labels.outputs.label_check == 'failure' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: "PR Label Check"
+          recreate: true
+          message: |
+            ### 🚨 Labels are missing
+            The PR is missing the required labels. Please add at least one of the following labels:
+            * `fix`
+            * `feature`
 
       - name: Validate PR title format
         run: |

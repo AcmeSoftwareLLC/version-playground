@@ -34,6 +34,7 @@ jobs:
             The title of this PR needs to be formatted correctly and include an JIRA Reference. 
             Please update the title to match the format `[JMACS-###] description`. Example:
             * `[JMACS-123] fix typo in README.md`
+
       - name: Add comment that PR title is fixed
         if: ${{ steps.check.outputs.success == 'true'}}
         uses: marocchino/sticky-pull-request-comment@v2
@@ -43,6 +44,13 @@ jobs:
           message: |
             ### ✅ PR Title Formatted Correctly
             The title of this PR has been updated to match the correct format. Thank you!
+
+      - name: Check Labels
+        uses: docker://agilepathway/pull-request-label-checker:latest
+        with:
+          one_of: fix,feature,meta
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Validate PR title format
         run: |
           if [ "${{ steps.check.outputs.success }}" = "true" ]; then
